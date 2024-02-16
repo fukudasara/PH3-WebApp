@@ -19,6 +19,7 @@ Route::get('/', [StudyTimeController::class, 'index'])->middleware(['auth'])->na
 Route::get('/get-barChart-data', [StudyTimeController::class, 'getBarChartData']);
 Route::get('/get-languagesPieChart-data', [StudyTimeController::class, 'getLanguagesPieChartData']);
 Route::get('/get-contentsPieChart-data', [StudyTimeController::class, 'getContentsPieChartData']);
+Route::post('store', [StudyTimeController::class, 'store'])->name('top.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

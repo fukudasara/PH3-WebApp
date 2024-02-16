@@ -6,6 +6,8 @@ use App\Models\Contents;
 use App\Models\Languages;
 use App\Models\StudyTime;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StudyTimeController extends Controller
 {
@@ -14,7 +16,48 @@ class StudyTimeController extends Controller
      */
     public function index()
     {
-        return view('index');
+        $languages = Languages::all();
+        $contents = Contents::all();
+
+        $now = Carbon::now();
+        $now_format = $now->format('Y-m-d');
+
+        $startOfDay = $now->startOfDay();
+        $endOfDay = $now->endOfDay();
+
+        $todays = DB::table('study_times')
+            ->whereDate('created_at', '=', $now->format('Y-m-d'))
+            ->sum('time');
+
+
+        $month_format = $now->format('Y-m H:i');
+        $weeks = $now->weekOfMonth;
+
+        $months = DB::table('study_times')
+            ->whereRaw('MONTH(created_at) = MONTH(?) AND YEAR(created_at) = YEAR(?)', [$now, $now])
+            ->sum('time');
+
+        $totals = DB::table('study_times')
+            ->sum('time');
+
+
+        $from = date('Y-m-01'); // 今月の初日
+        $to = date('Y-m-t'); // 今月の末日
+        $dailyData = DB::table('study_times')
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(time) as total_time'))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy('date')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => Carbon::parse($item->date)->format('d'),
+                    'total_time' => $item->total_time
+                ];
+            });
+            // dd($endOfMonth);
+
+
+        return view('index', compact('languages', 'contents', 'todays', 'months', 'totals'));
     }
 
     /**
@@ -112,7 +155,31 @@ class StudyTimeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $records = new StudyTime;
+
+        // $records->create([
+        //     'time' => $request->time,
+        //     'record_at' => $request->date,
+        //     'content_id' => $request->content,
+        //     'language_id' => $request->language,
+        // ]);
+
+        // チェックボックスで選択された学習コンテンツのIDの配列を取得
+        $contentIds = $request->input('contents', []);
+    
+        // 選択された学習コンテンツごとに学習記録を作成
+        foreach ($contentIds as $contentId) {
+            $records = new StudyTime();
+            $records->create([
+                'time' => $request->input('time'),
+                // 'created_at' => $request->input('date'),
+                'content_id' => $contentId,
+                'language_id' => $request->input('language'),
+            ]);
+        }
+
+        return redirect()->route('study_time.index');
+        dd($records);
     }
 
     /**

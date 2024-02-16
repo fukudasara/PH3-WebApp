@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>webapp</title>
-  <link rel="stylesheet" href="/css/reset.css"">
-  <link rel=" stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body id="body">
   <header class="header">
@@ -22,17 +22,17 @@
       <section class="study-hours">
         <div class="today-wrapper">
           <div class="study-hours-title">Today</div>
-          <div class="study-hours-hour" id="studyHoursToday">0</div>
+          <div class="study-hours-hour" id="studyHoursToday">{{$todays}}</div>
           <div class="study-hours-unit">hour</div>
         </div>
         <div class="month-wrapper">
           <div class="study-hours-title">Month</div>
-          <div class="study-hours-hour" id="studyHoursMonth">0</div>
+          <div class="study-hours-hour" id="studyHoursMonth">{{$months}}</div>
           <div class="study-hours-unit">hour</div>
         </div>
         <div class="total-wrapper">
           <div class="study-hours-title">Total</div>
-          <div class="study-hours-hour" id="studyHoursTotal">0</div>
+          <div class="study-hours-hour" id="studyHoursTotal">{{$totals}}</div>
           <div class="study-hours-unit">hour</div>
         </div>
       </section>
@@ -61,6 +61,82 @@
         </div>
       </section>
     </div>
+    <!-- 以下モーダル -->
+    <div id="easyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="modalClose">✖️</button>
+        </div>
+        <div class="postComplete">
+            <div class="postCompleteContent">
+                <p class="completeAwesome">AWESOME!</p>
+                <div class="completeCheck">
+                    <span class="completeCheckS"></span>
+                </div>
+                <p class="postCompleteP">記録・投稿完了しました</p>
+            </div>
+        </div>
+        <div class="modal-body" id="modal-body">
+        <form action="{{ route('top.store') }}" method="POST">
+                @csrf
+            <div class="modal-input-content">
+                <div class="modal-left">
+                    <div class="modal-gakushuDate">
+                        <label for="modal-gakushuDateInput" class="modal-headLine">学習日</label>
+                        <input type="date" class="modal-date-input" size="10" id="modal-gakushuDateInput">
+                    </div>
+                    <div class="modal-gakushuContent">
+                        <p class="modal-headLine">学習コンテンツ</p>
+                        <!-- 学習コンテンツのチェックボックスなどを追加 -->
+                        <!-- <select name="content">
+                                    @foreach($contents as $content)
+                                    <option value="{{$content->id}}" >{{$content->name}}</option>
+                                    @endforeach
+                        </select> -->
+                        @foreach($contents as $content)
+                          <label>
+                              <input type="checkbox" name="contents[]" value="{{$content->id}}">
+                              {{$content->name}}
+                          </label>
+                      @endforeach
+                    </div>
+                    <div class="modal-gakushuLang">
+                        <p class="modal-headLine">学習言語（複数選択可）</p>
+                        <!-- 学習言語のチェックボックスなどを追加 -->
+                        <select name="language">
+                                @foreach($languages as $language)
+                                <option value="{{$language->id}}" >{{$language->name}}</option>
+                                @endforeach
+                        </select>
+
+                    </div>
+                </div>
+                <div class="modal-right">
+                    <div class="modal-gakushuTime">
+                        <label for="modal-gakushuTimeInput" class="modal-headLine">学習時間</label>
+                        <input type="text" id="modal-gkushuTimeInput" class="modal-hour-text" name="time">
+                    </div>
+                    <div class="modal-twitter">
+                        <label class="modal-headLine">Twitter用コメント</label>
+                        <textarea maxlength="140" id="modal-twitterInput" class="modal-twitter-text"></textarea>
+                    </div>
+                    <div class="modal-twitterShare">
+                        <label class="my-checkboxT">
+                            <input type="checkbox" id="js-my-checkboxT">
+                            <span class="checkmark" id="twitterCheck"></span>
+                            <p>Twitterにシェアする</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" id="modal-footer">
+            <button id="modal-record" class="modal-post">記録・投稿</button>
+        </div>
+    </div>
+</div>
+</form>
+    <!-- 以上モーダル -->
   </main>
   <footer class="footer">
     <div class="one-month-before" id="oneMonthBefore">
@@ -74,5 +150,6 @@
   <script src="https://kit.fontawesome.com/afb3b2864c.js" crossorigin="anonymous"></script>
   <script src="/js/chart.js"></script>
   <script src="/js/modal.js"></script>
+  <script src="/js/common.js"></script>
 </body>
 </html>
